@@ -1,29 +1,11 @@
 #############################################################################################################################
-# Testing Power of different estimators: Null Hypothesis that R=I and varying instruments
+# One-sample Testing
 # Author: Chin Yang Shapland
 # Last Updated: 28/09/22
 ############################################################################################################################
 
-# Summary
-# Checking the TIE from the correlation test from "psych" package,
-# note that the covariance test is not here, as they are essentially testing the same thing,
-# i.e. whether the off-diagonal is zero
-
-### Set work directories ###
-#wkdir<-"C:/Users/ew18103/University of Bristol/grp-Programme3-CYS - Documents/Bayesian_MissingData/R/CorrTests/identity_matrix/"
-#setwd(wkdir)
-
 ### Load functions and packages ###
-#fundir<-"C:/Users/ew18103/University of Bristol/grp-Programme3-CYS - Documents/Bayesian_MissingData/R/CorrTests/"
-#source(paste(fundir, "Functions_CorTest_v6.R", sep=""))
-
-### Set work directories ###
-wkdir<-"C:/Users/ew18103/University of Bristol/grp-Programme3-CYS - Documents/Bayesian_MissingData/R/CorrTests/identity_matrix/"
-setwd(wkdir)
-
-### Load functions and packages ###
-fundir<-"C:/Users/ew18103/University of Bristol/grp-Programme3-CYS - Documents/Bayesian_MissingData/R/CorrTests/"
-source(paste(fundir, "Functions_CorTest_v6.R", sep=""))
+source("Functions.R")
 
 library(MASS)
 library(psych)
@@ -52,8 +34,6 @@ eta_x<-0.988
 #Store results
 res_nSNPdiff<-matrix(0, nSim, 6)
 res_nSNPdiff_all<-list()
-
-ptm <- proc.time()
 
 for (k in 1:length(varGX_range)){
   #k<-1
@@ -108,10 +88,3 @@ for (k in 1:length(varGX_range)){
   res_nSNPdiff_all[[k]]<-res_nSNPdiff
 
 }
-
-RunTime<-proc.time() - ptm
-
-etas<-c(Eta_0=eta_0, Eta_z=eta_z, Eta_c=eta_c, Eta_y=eta_y, Eta_x=eta_x)
-names(res_nSNPdiff_all)<-varGX_range
-
-saveResults(res_nSNPdiff_all, NA, "output/Res_CorTests_ident_VarGX", seed,nSim, nSNP, n, NA, varXY, varGX, etas, RunTime)

@@ -1,19 +1,11 @@
 #############################################################################################################################
-# Testing power of different estimators: Null Hypothesis that R_1=R_2
+# Two-sample testing
 # Author: Chin Yang Shapland
 # Last Updated: 16/12/22
 ############################################################################################################################
 
-# Summary
-# Find a scenario that Jennrich does work
-
-### Set work directories ###
-wkdir<-"C:/Users/ew18103/University of Bristol/grp-Programme3-CYS - Documents/Bayesian_MissingData/R/TwoSample/"
-setwd(wkdir)
-
 ### Load functions and packages ###
-fundir<-"C:/Users/ew18103/University of Bristol/grp-Programme3-CYS - Documents/Bayesian_MissingData/R/CorrTests/"
-source(paste(fundir, "Functions_CorTest_v6.R", sep=""))
+source("Functions.R")
 
 library(MASS)
 library(psych)
@@ -113,10 +105,3 @@ for (k in 1:length(n_range)){
   res_nSNPdiff_all[[k]]<-res_nSNPdiff
   SimCheck_all[[k]]<-SimCheck
 }
-
-RunTime<-proc.time() - ptm
-
-etas<-c(Eta_0=eta_0, Eta_z=eta_z, Eta_c=eta_c, Eta_y=eta_y, Eta_x=eta_x)
-names(res_nSNPdiff_all)<-n_range
-
-saveResults(res_nSNPdiff_all, SimCheck_all, "output/Res_CovCorTests_TwoSample_LargeVarGX_N", seed,nSim, nSNP, n, NA, varXY, varGX, etas, RunTime)

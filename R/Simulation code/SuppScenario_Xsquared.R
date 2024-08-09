@@ -1,18 +1,11 @@
 #############################################################################################################################
-# Testing power of different estimators: Null Hypothesis that R_1=R_2
+# One-sample and two-sample testing with X^2
 # Author: Chin Yang Shapland
-# Last Updated: 28/09/22
+# Last Updated: 05/02/24
 ############################################################################################################################
 
-# Summary
-# Checking the power from the correlation test from "psych" package, and also BoXM test
-
-### Set work directories ###
-wkdir<-"/mnt/storage/home/ew18103/CorTest/TwoSample/"
-setwd(wkdir)
-
 ### Load functions and packages ###
-source("/mnt/storage/home/ew18103/CorTest/Functions_CorTest_v6.R")
+source("Functions.R")
 
 library(MASS)
 library(psych)
@@ -33,7 +26,7 @@ varXY<-0.1
 varGX<-0.45
 
 #Parameters for selection pressure
-eta_0<-0.5
+eta_0<-(-0.33)
 eta_z<-0
 eta_c<-0
 eta_y<-0
@@ -42,16 +35,16 @@ eta_x<-0.988
 #Store results
 SimCheck_all<-list()
 res_oneSample_all<-list()
+res_nSNPdiff_all<-list()
 
-ptm <- proc.time()
-
-for (k in 1:length(varGX_range)){
+for (k in 1:length(n_range)){
   #k<-1
-  varGX<-varGX_range[k]
+  n<-n_range[k]
 
   #Store results
   SimCheck<-matrix(0, nSim, 4)
   res_oneSample<-matrix(0, nSim, 12)
+  res_nSNPdiff<-matrix(0, nSim, 6)
 
   for (i in 1:nSim){
 
@@ -102,7 +95,7 @@ for (k in 1:length(varGX_range)){
     res_oneSample[i,3]<-cortest(MissX_R1,NULL,n1=nrow(MissX_1), n2=NULL)$prob
     res_oneSample[i,4]<-cortest(MissX_R2,NULL,n1=nrow(MissX_2), n2=NULL)$prob
 
-    #the Jennrich test (n2=Inf avoids measurement error from identity matrix)
+    #the Jennrich test (n2=Inf avoids measurement error from identifity matrix)
     res_oneSample[i,5]<-cortest_jennrich(MCAR_R1,diag(nSNP),n1=nrow(MCAR_1), n2=Inf)$prob
     res_oneSample[i,6]<-cortest_jennrich(MCAR_R2,diag(nSNP),n1=nrow(MCAR_2), n2=Inf)$prob
     res_oneSample[i,7]<-cortest_jennrich(MissX_R1,diag(nSNP),n1=nrow(MissX_1), n2=Inf)$prob
@@ -114,15 +107,27 @@ for (k in 1:length(varGX_range)){
     res_oneSample[i,11]<-cortest.bartlett(MissX_R1,n=nrow(MissX_1))$p.value
     res_oneSample[i,12]<-cortest.bartlett(MissX_R2,n=nrow(MissX_2))$p.value
 
+    ### Two sample test ###
+    #the steiger test
+    res_nSNPdiff[i,1]<-cortest(MCAR_R1,  MCAR_R2, n1=nrow(MCAR_1), n2=nrow(MCAR_2))$prob
+    res_nSNPdiff[i,2]<-cortest(MissX_R1, MissX_R2, n1=nrow(MissX_1), n2=nrow(MissX_2))$prob
+
+    #the Jennrich test
+    res_nSNPdiff[i,3]<-cortest_jennrich(MCAR_R1,  MCAR_R2, n1=nrow(MCAR_1), n2=nrow(MCAR_2))$prob
+    res_nSNPdiff[i,4]<-cortest_jennrich(MissX_R1, MissX_R2, n1=nrow(MissX_1), n2=nrow(MissX_2))$prob
+
+    #add missing indicator for BoxM
+    DataXY_MCAR["Miss"]<-ifelse(is.na(DataXY_MCAR$X), 1, 2)
+    DataXY_missX["Miss"]<-ifelse(is.na(DataXY_missX$X), 1, 2)
+
+    #BoxM test
+    res_nSNPdiff[i,5]<-boxM(DataXY_MCAR[,paste("SNP",1:nSNP,sep="")], DataXY_MCAR[,"Miss"])$p.value
+    res_nSNPdiff[i,6]<-boxM(DataXY_missX[,paste("SNP",1:nSNP,sep="")], DataXY_missX[,"Miss"])$p.value
+
   }
 
+  res_nSNPdiff_all[[k]]<-res_nSNPdiff
   res_oneSample_all[[k]]<-res_oneSample
   SimCheck_all[[k]]<-SimCheck
+
 }
-
-RunTime<-proc.time() - ptm
-
-etas<-c(Eta_0=eta_0, Eta_z=eta_z, Eta_c=eta_c, Eta_y=eta_y, Eta_x=eta_x)
-names(res_oneSample_all)<-varGX_range
-
-saveResults(res_oneSample_all, SimCheck_all, "output/Res_CovCorTests_ident_N", seed,nSim, nSNP, n, NA, varXY, varGX, etas, RunTime)
