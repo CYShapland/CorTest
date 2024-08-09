@@ -1,10 +1,5 @@
 cortest_jennrich <- function (R1, R2, n1 = NULL, n2 = NULL) {
 
-  R1<-MCAR_R1
-  R2<-MCAR_R2
-  n1=as.numeric(nrow(MCAR_1))
-  n2=as.numeric(nrow(MCAR_2))
-
   p <- dim(R1)[2]
   if (dim(R1)[1] != p) {
     n1 <- dim(R1)[1]
@@ -37,24 +32,6 @@ cortest_jennrich <- function (R1, R2, n1 = NULL, n2 = NULL) {
     c <- 1
     R <- (n1 * R1 + n2 * R2)/(n1 + n2)
   }
-
-  MCAR_R1,  MCAR_R2
-  n1=as.numeric(nrow(MCAR_1))
-  n2=as.numeric(nrow(MCAR_2))
-
-  N<-n1+n2
-  rbar<-((n1 * MCAR_R1) + (n2 * MCAR_R2))/N
-  rbar.inv <- solve(rbar)
-  Z1<-sqrt(n1) * rbar.inv %*% (MCAR_R1-rbar)
-  Z2<-sqrt(n2) * rbar.inv %*% (MCAR_R2-rbar)
-
-  S <- diag(nSNP) + (rbar %*% rbar.inv)
-  S.inv <- solve(S)
-
-  chi2_1<-tr(Z1 %*% t(Z1))/2 - t(diag(Z1)) %*% S.inv %*% diag(Z1)
-  chi2_2<-tr(Z2 %*% t(Z2))/2 - t(diag(Z2)) %*% S.inv %*% diag(Z2)
-
-  chi2_1+chi2_2
 
   R.inv <- solve(R)
   S <- diag(p) + R * R.inv
