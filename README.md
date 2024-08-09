@@ -6,7 +6,7 @@ Simulation code and R package used for manuscript "Use of genetic correlations t
 
 Within the manuscript, for one sample test we have used package `psych` for Steiger and Bartlett's test. However there was an error in Jennrich, we have modified it in `cortest_jenn.R`.
 
-Folder `Simulation code` provides R code for simulated data of each scenarios within our manuscript and supplementary materials.
+Folder `R/Simulation code` provides R code for simulated data of each scenarios within our manuscript and supplementary materials.
 
 ## Citation
 
